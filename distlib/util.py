@@ -1450,8 +1450,10 @@ if ssl:
                     match_hostname(self.sock.getpeercert(), self.host)
                     logger.debug('Host verified: %s', self.host)
                 except CertificateError:  # pragma: no cover
-                    self.sock.shutdown(socket.SHUT_RDWR)
-                    self.sock.close()
+                    with contextlib.suppress(OSError):
+                        self.sock.shutdown(socket.SHUT_RDWR)
+                    with contextlib.suppress(OSError):
+                        self.sock.close()
                     raise
 
     class HTTPSHandler(BaseHTTPSHandler):
